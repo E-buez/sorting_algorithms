@@ -1,46 +1,57 @@
 #include "sort.h"
+
+void swap(listint_t **head, listint_t *node1, listint_t *node2);
 /**
- * insertion_sort_list - function that sorts a doubly linked list
- * of integers in ascending order using the Insertion sort algorithm
- * @list: Dobule linked list to sort
+ * insertion_sort_list - sorts a doubly linked list with
+ * the insertion sort algorithm
+ *
+ * @list: list to be sorted
+ *
+ * Return: void
  */
 void insertion_sort_list(listint_t **list)
 {
-	listint_t *node;
+	listint_t *forw, *tmp;
 
-	if (list == NULL || (*list)->next == NULL)
+	if (list == NULL || *list == NULL || (*list)->next == NULL)
 		return;
-	node = (*list)->next;
-	while (node)
+
+	for (forw = (*list)->next; forw && forw->prev; forw = forw->next)
 	{
-		while ((node->prev) && (node->prev->n > node->n))
+		for (; forw && forw->prev && forw->n < forw->prev->n;
+		     forw = forw->prev)
 		{
-			node = swap_node(node, list);
+			tmp = forw->prev;
+			swap(list, tmp, forw);
 			print_list(*list);
+			forw = forw->next;
 		}
-		node = node->next;
 	}
 }
-/**
- *swap_node - swap a node for his previous one
- *@node: node
- *@list: node list
- *Return: return a pointer to a node which was enter it
- */
-listint_t *swap_node(listint_t *node, listint_t **list)
-{
-	listint_t *back = node->prev, *current = node;
-	/*NULL, 19, 48, 9, 71, 13, NULL*/
 
-	back->next = current->next;
-	if (current->next)
-		current->next->prev = back;
-	current->next = back;
-	current->prev = back->prev;
-	back->prev = current;
-	if (current->prev)
-		current->prev->next = current;
+/**
+ * swap - swaps two nodes
+ * @head: the head node
+ * @node1: The first node
+ * @node2: the second node
+ *
+ * Return: void
+ */
+void swap(listint_t **head, listint_t *node1, listint_t *node2)
+{
+	listint_t *prev, *next;
+
+	prev = node1->prev;
+	next = node2->next;
+
+	if (prev != NULL)
+		prev->next = node2;
 	else
-		*list = current;
-	return (current);
+		*head = node2;
+	node1->prev = node2;
+	node1->next = next;
+	node2->prev = prev;
+	node2->next = node1;
+	if (next)
+		next->prev = node1;
 }
