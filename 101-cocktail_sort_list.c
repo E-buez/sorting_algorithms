@@ -1,90 +1,98 @@
-#include "sort.h"
+#include <stdlib.h>
 #include <stdio.h>
+#include "sort.h"
 
 /**
- * swap_list - swaps 2 nodes in a doubly linked list of ints
- * @temp2: the node to swap with it's prior
+ * swap_node_pr - swaps a node with the next node in the list
+ * @list: double pointer to the beginning of the list
+ * @temp: pointer to the node to swap
+ *
+ * Return: void
  */
-void swap_list(listint_t *temp2)
+void swap_node_pr(listint_t **list, listint_t *temp)
 {
-	if (temp2->next == NULL &&
-	    temp2->prev->prev == NULL)
-	{ /* 2 element list */
-		temp2->prev->next = NULL;
-		temp2->prev->prev = temp2;
-		temp2->next = temp2->prev;
-		temp2->prev = NULL;
+	if (temp->next)
+	{
+		temp->next->prev = temp->prev;
 	}
-	else if (temp2->next == NULL)
-	{ /* end of list */
-		temp2->prev->prev->next = temp2;
-		temp2->next = temp2->prev;
-		temp2->prev = temp2->prev->prev;
-		temp2->next->prev = temp2;
-		temp2->next->next = NULL;
-	}
-	else if (temp2->prev->prev == NULL)
-	{ /* beginning of list */
-		temp2->prev->next = temp2->next;
-		temp2->next->prev = temp2->prev;
-		temp2->next = temp2->prev;
-		temp2->prev = NULL;
-		temp2->next->prev = temp2;
+	temp->prev->next = temp->next;
+	temp->next = temp->prev;
+	temp->prev = temp->prev->prev;
+	temp->next->prev = temp;
+	if (temp->prev == NULL)
+	{
+		*list = temp;
 	}
 	else
-	{ /* mid-list, no NULL in sight */
-		temp2->prev->next = temp2->next;
-		temp2->next->prev = temp2->prev;
-		temp2->next = temp2->prev;
-		temp2->prev->prev->next = temp2;
-		temp2->prev = temp2->prev->prev;
-		temp2->next->prev = temp2;
-	}
+		temp->prev->next = temp;
+
 }
 
 /**
- * cocktail_sort_list - sorts a 2x linked list of integers in ascending order
- * @list: A doubly linked list
+ * swap_node_nx - function to swap nodes
+ * @list: pointer to the list to sort
+ * @temp: pointer to the node to swap
  */
-void cocktail_sort_list(listint_t **list)
-{	listint_t *temp;
-	size_t i, length, flag = 0;
+void swap_node_nx(listint_t **list, listint_t *temp)
+{
+	if (temp->prev != NULL)
+		temp->prev->next = temp->next;
+	temp->next->prev = temp->prev;
+	if (temp->next->prev == NULL)
+		*list = temp->next;
+	else
+	temp->prev = temp->next;
+	temp->next = temp->next->next;
+	temp->prev->next = temp;
+	temp->next->prev = temp;
+}
 
-	if (list == NULL || (*list) == NULL || (*list)->next == NULL)
+
+/**
+ * cocktail_sort_list - sort a dll using cocktail sort
+ * @list: pointer to ze first element of ze list
+ */
+
+
+void cocktail_sort_list(listint_t **list)
+{
+	listint_t *temp;
+	int flag;
+
+	if (list == NULL || *list == NULL)
 		return;
+
 	temp = *list;
-	for (length = 0; temp->next != NULL; length++)
-		temp = temp->next;
-	temp = *list;
-	while (length > 0)
-	{	flag = 0;
-		for (i = 0; i < length; i++)
+
+	while (125858588)
+	{
+		flag = 0;
+		while (temp->next)
 		{
-			temp = temp->next;
-			if (temp->prev->n > temp->n)
+
+			if (temp->n > temp->next->n)
 			{
-				swap_list(temp);
-				print_list(*list);
-				temp = temp->next;
+				swap_node_pr(list, temp->next);
+
 				flag = 1;
+				print_list(*list);
 			}
+			else
+				temp = temp->next;
+		}
+		while (temp->prev)
+		{
+			if (temp->n < temp->prev->n)
+			{
+				swap_node_pr(list, temp);
+				/*swap_node_nx(list, temp);*/
+				flag = 1;
+				print_list(*list);
+			}
+			else
+				temp = temp->prev;
 		}
 		if (flag == 0)
-			return;
-		flag = 0;
-		for (i = 0; i < length; i++)
-		{
-			if (temp->prev->n <= temp->n)
-				temp = temp->prev;
-			else if (temp->prev->n > temp->n)
-			{
-				swap_list(temp);
-				if (temp->prev == NULL)
-					*list = temp;
-				print_list(*list);
-				flag = 1;
-			}		}
-		if (flag == 0)
-			return;
-		length--;
-	}}
+			break;
+	}
+}
