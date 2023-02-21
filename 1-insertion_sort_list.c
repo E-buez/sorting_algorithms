@@ -1,57 +1,65 @@
 #include "sort.h"
 
-void swap(listint_t **head, listint_t *node1, listint_t *node2);
 /**
- * insertion_sort_list - sorts a doubly linked list with
- * the insertion sort algorithm
- *
- * @list: list to be sorted
- *
- * Return: void
- */
-void insertion_sort_list(listint_t **list)
+*len_list -	Returns the length of a doubly linked list
+*@head:     Pointer to the Doubly Linked List
+*
+* Return:	Length of Doubly Linked List
+*/
+int len_list(listint_t *head)
 {
-	listint_t *forw, *tmp;
+	int len = 0;
 
-	if (list == NULL || *list == NULL || (*list)->next == NULL)
-		return;
-
-	for (forw = (*list)->next; forw && forw->prev; forw = forw->next)
+	while (head)
 	{
-		for (; forw && forw->prev && forw->n < forw->prev->n;
-		     forw = forw->prev)
-		{
-			tmp = forw->prev;
-			swap(list, tmp, forw);
-			print_list(*list);
-			forw = forw->next;
-		}
+		len++;
+		head = head->next;
 	}
+	return (len);
 }
 
 /**
- * swap - swaps two nodes
- * @head: the head node
- * @node1: The first node
- * @node2: the second node
- *
- * Return: void
- */
-void swap(listint_t **head, listint_t *node1, listint_t *node2)
+* swap_nodes - Swap two adjusent nodes in list
+* @head:    A pointer to the head of the double-linked list
+* @nodeP1:  A pointer to the first node to swap
+* @nodeP2:  A pointer to the second node to swap
+*/
+void swap_nodes(listint_t **head, listint_t **nodeP1, listint_t *nodeP2)
 {
-	listint_t *prev, *next;
-
-	prev = node1->prev;
-	next = node2->next;
-
-	if (prev != NULL)
-		prev->next = node2;
+	(*nodeP1)->next = nodeP2->next;
+	if (nodeP2->next != NULL)
+		nodeP2->next->prev = *nodeP1;
+	nodeP2->prev = (*nodeP1)->prev;
+	nodeP2->next = *nodeP1;
+	if ((*nodeP1)->prev != NULL)
+		(*nodeP1)->prev->next = nodeP2;
 	else
-		*head = node2;
-	node1->prev = node2;
-	node1->next = next;
-	node2->prev = prev;
-	node2->next = node1;
-	if (next)
-		next->prev = node1;
+		*head = nodeP2;
+	(*nodeP1)->prev = nodeP2;
+	*nodeP1 = nodeP2->prev;
+}
+
+
+/**
+* insertion_sort_list -   sorts a Doubly Linked List
+*                           using the Insertion Sort Algorithm
+* @list:    A pointer to the head of doubly linked list of integers
+*/
+void insertion_sort_list(listint_t **list)
+{
+	listint_t *i, *j, *tmp;
+
+	if (list == NULL || *list == NULL || len_list(*list) < 2)
+		return;
+
+	for (i = (*list)->next; i != NULL; i = tmp)
+	{
+		tmp = i->next;
+		j = i->prev;
+		while (j != NULL && j->n > i->n)
+		{
+			swap_nodes(list, &j, i);
+			print_list((const listint_t *)*list);
+		}
+	}
 }
